@@ -1,37 +1,40 @@
 package com.example.ivan.filemanager;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends ListActivity {
 
+public class MainActivity extends Activity {
+    public static DirectoryItemAdapter directoryItemAdapter;
+    List items = new ArrayList<DirectoryItem>();
     private String path;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        listView = (ListView) findViewById(R.id.listView);
+
         // Use the current directory as title
         path = "/";
         if (getIntent().hasExtra("path")) {
             path = getIntent().getStringExtra("path");
         }
-        setTitle(path);
+//        setTitle(path);
 
-        // Read all files sorted into the values-array
-        List values = new ArrayList();
+// Read all files sorted into the values-array
+
         File dir = new File(path);
         if (!dir.canRead()) {
             setTitle(getTitle() + " (inaccessible)");
@@ -40,32 +43,40 @@ public class MainActivity extends ListActivity {
         if (list != null) {
             for (String file : list) {
                 if (!file.startsWith(".")) {
-                    values.add(file);
+                    items.add(new DirectoryItem(path, file));
                 }
             }
         }
-        Collections.sort(values);
+//        Collections.sort(values);Collections.sort(items);
 
         // Put the data into the list
-        ArrayAdapter adapter = new ArrayAdapter(this,
-                android.R.layout.simple_list_item_2, android.R.id.text1, values);
-        setListAdapter(adapter);
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        String filename = (String) getListAdapter().getItem(position);
-        if (path.endsWith(File.separator)) {
-            filename = path + filename;
-        } else {
-            filename = path + File.separator + filename;
-        }
-        if (new File(filename).isDirectory()) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("path", filename);
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, filename + " is not a directory", Toast.LENGTH_LONG).show();
-        }
+        directoryItemAdapter = new DirectoryItemAdapter(this,
+                R.layout.layout_list_item);
+        listView.setAdapter(directoryItemAdapter);
+        directoryItemAdapter.updateList(items);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DirectoryItem file = (DirectoryItem) items.get(position);
+                String filename;
+                if (path.endsWith(File.separator)) {
+                    filename = path + file.getName();
+                } else {
+                    filename = path + File.separator + file.getName();
+                }
+                Toast.makeText(MainActivity.this, filename, Toast.LENGTH_SHORT).show();
+                if (new File(filename).isDirectory()) {
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    intent.putExtra("path", filename);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, filename + " is not a directory", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
+
+
+
+
