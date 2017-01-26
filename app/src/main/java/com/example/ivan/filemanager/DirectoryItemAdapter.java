@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -107,8 +108,10 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
         tvLastModified.setText(list.get(position).getLastModified());
         TextView tvSize = (TextView) view.findViewById(R.id.tvSize);
         tvSize.setText(list.get(position).getSize());
-
-
+        CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
+        cbSelected.setVisibility(View.INVISIBLE);
+        if (MainActivity.isVisibilityOfCheckBox())
+            cbSelected.setVisibility(View.VISIBLE);
         return view;
     }
 }

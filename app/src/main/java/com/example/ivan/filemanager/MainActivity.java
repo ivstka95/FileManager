@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
     private String path = "/";
     private ListView listView;
     private Button bNewFolder;
+    private static boolean visibilityOfCheckBox = false;
 
     private RecyclerView horizontal_recycler_view;
     private ArrayList<String> horizontalList;
@@ -99,32 +100,46 @@ public class MainActivity extends Activity {
                                                 @Override
                                                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position,
                                                                                long id) {
-                                                    DirectoryItem file = (DirectoryItem) items.get(position);
-                                                    final String filename = file.getFilepath();
-                                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                    builder.setTitle("Delete " + file.getName() + "?")
-                                                            .setCancelable(false)
-                                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                                                @Override
-                                                                public void onClick(DialogInterface dialog, int which) {
-                                                                    delete(filename);
-                                                                    if (!new File(filename).exists()) {
-                                                                        Toast.makeText(MainActivity.this, "Deleted" + filename, Toast.LENGTH_SHORT).show();
-                                                                        refreshList(cutPath(path));
-                                                                    } else {
-                                                                        Toast.makeText(MainActivity.this, "NOT deleted" + filename, Toast.LENGTH_SHORT).show();
-                                                                        refreshList(cutPath(path));
-                                                                    }
-                                                                }
-                                                            })
-                                                            .setNegativeButton("NO",
-                                                                    new DialogInterface.OnClickListener() {
-                                                                        public void onClick(DialogInterface dialog, int id) {
-                                                                            dialog.cancel();
-                                                                        }
-                                                                    });
-                                                    AlertDialog alert = builder.create();
-                                                    alert.show();
+                                                    visibilityOfCheckBox = true;
+//                                                    List l = new ArrayList<DirectoryItem>();
+//                                                    for (int i = 0; i < items.size(); i++) {
+//                                                        DirectoryItem di = (DirectoryItem) items.get(i);
+//                                                        di.setVisibilityOfCheckBox(true);
+//                                                        l.add(di);
+//                                                    }
+//                                                    items.clear();
+//                                                    items.addAll(l);
+                                                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                                                    intent.putExtra("path", path);
+                                                    startActivity(intent);
+//                                                    directoryItemAdapter.updateList(items);
+
+//                                                    DirectoryItem file = (DirectoryItem) items.get(position);
+//                                                    final String filename = file.getFilepath();
+//                                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                                                    builder.setTitle("Delete " + file.getName() + "?")
+//                                                            .setCancelable(false)
+//                                                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+//                                                                @Override
+//                                                                public void onClick(DialogInterface dialog, int which) {
+//                                                                    delete(filename);
+//                                                                    if (!new File(filename).exists()) {
+//                                                                        Toast.makeText(MainActivity.this, "Deleted" + filename, Toast.LENGTH_SHORT).show();
+//                                                                        refreshList(cutPath(path));
+//                                                                    } else {
+//                                                                        Toast.makeText(MainActivity.this, "NOT deleted" + filename, Toast.LENGTH_SHORT).show();
+//                                                                        refreshList(cutPath(path));
+//                                                                    }
+//                                                                }
+//                                                            })
+//                                                            .setNegativeButton("NO",
+//                                                                    new DialogInterface.OnClickListener() {
+//                                                                        public void onClick(DialogInterface dialog, int id) {
+//                                                                            dialog.cancel();
+//                                                                        }
+//                                                                    });
+//                                                    AlertDialog alert = builder.create();
+//                                                    alert.show();
                                                     return false;
                                                 }
                                             }
@@ -161,6 +176,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     if (position < horizontalList.size() - 1) {
+                        visibilityOfCheckBox = false;
                         String filename = getQiuckPath(position);
                         Intent intent = new Intent(MainActivity.this, MainActivity.class);
                         intent.putExtra("path", filename);
@@ -224,6 +240,7 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         path = cutPath(path);
+        visibilityOfCheckBox = false;
         super.onBackPressed();
     }
 
@@ -266,6 +283,11 @@ public class MainActivity extends Activity {
         }
         return quickPath;
     }
+
+    public static boolean isVisibilityOfCheckBox() {
+        return visibilityOfCheckBox;
+    }
+
 }
 
 

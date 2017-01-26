@@ -14,8 +14,7 @@ import java.util.Date;
 public class DirectoryItem {
     private String path;
     private String name;
-//    private CheckBox cbSelected;
-//    private boolean visibilityOfCheckBox=false;
+    private CheckBox cbSelected;
 
 
     public DirectoryItem(String path, String name) {
