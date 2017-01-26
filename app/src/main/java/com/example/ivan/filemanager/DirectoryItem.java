@@ -1,5 +1,7 @@
 package com.example.ivan.filemanager;
 
+import android.widget.CheckBox;
+
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -12,6 +14,8 @@ import java.util.Date;
 public class DirectoryItem {
     private String path;
     private String name;
+//    private CheckBox cbSelected;
+//    private boolean visibilityOfCheckBox=false;
 
 
     public DirectoryItem(String path, String name) {
