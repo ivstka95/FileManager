@@ -7,13 +7,13 @@
 
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/horizontal_recycler_view"
+        android:id="@+id/horizontal_recycler_view2"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="#fff" />
 
     <ListView
-        android:id="@+id/listView"
+        android:id="@+id/listView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="23" />
@@ -25,28 +25,21 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/bCopy"
+            android:id="@+id/bCancel"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="2dp"
-            android:text="Copy" />
+            android:text="Cancel" />
 
         <Button
-            android:id="@+id/bMove"
+            android:id="@+id/bPasteHere"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="2dp"
-            android:text="Move" />
+            android:text="Paste here" />
 
-        <Button
-            android:id="@+id/bDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_margin="2dp"
-            android:text="Delete" />
-
-        <Button
-            android:id="@+id/bNewFolder"
+               <Button
+            android:id="@+id/bNewFolder2"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="2dp"

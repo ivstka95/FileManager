@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,8 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
     private List<DirectoryItem> list;
     private Context context;
     private LayoutInflater inflater;
+    private boolean[] selectedItems;
+//    List selectedItems;
 
     public DirectoryItemAdapter(Context context, int resource) {
         super(context, resource);
@@ -60,7 +63,7 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
             view = inflater.inflate(R.layout.layout_list_item, parent, false);
@@ -68,7 +71,7 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
 
         ImageView ivIcon = (ImageView) view.findViewById(R.id.ivIcon);
         int imageID = R.drawable.file;
-        DirectoryItem file = (DirectoryItem) list.get(position);
+        final DirectoryItem file = (DirectoryItem) list.get(position);
 
         if (new File(file.getFilepath()).isDirectory()) {
             imageID = R.drawable.folder;
@@ -108,10 +111,19 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
         tvLastModified.setText(list.get(position).getLastModified());
         TextView tvSize = (TextView) view.findViewById(R.id.tvSize);
         tvSize.setText(list.get(position).getSize());
-        CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
-        cbSelected.setVisibility(View.INVISIBLE);
-        if (MainActivity.isVisibilityOfCheckBox())
+        final CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
+        cbSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (cbSelected.isChecked()) {
+                    list.get(position).setSelected(true);
+                } else list.get(position).setSelected(false);
+            }
+        });
+        if (MainActivity.isCheckBoxVisibility())
             cbSelected.setVisibility(View.VISIBLE);
+        else cbSelected.setVisibility(View.GONE);
+        cbSelected.setChecked(list.get(position).getSelected());
         return view;
     }
 }

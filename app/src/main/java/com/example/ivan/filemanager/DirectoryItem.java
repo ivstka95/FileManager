@@ -15,15 +15,26 @@ public class DirectoryItem {
     private String path;
     private String name;
     private CheckBox cbSelected;
+    private boolean selected;
 
 
-    public DirectoryItem(String path, String name) {
+
+    public DirectoryItem(String path, String name, boolean selected) {
         this.name = name;
         this.path = path;
+        this.selected = selected;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean getSelected(){
+        return selected;
+    }
+
+
     public String getIntentType() {
-        String intentType = "";
         if (getType().equalsIgnoreCase(".htm") || getType().equalsIgnoreCase(".html") ||
                 getType().equalsIgnoreCase(".htmls") || getType().equalsIgnoreCase(".htt") ||
                 getType().equalsIgnoreCase(".htx") || getType().equalsIgnoreCase(".java") ||
