@@ -8,11 +8,18 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -23,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.example.ivan.filemanager.Constants.DIRECTORY_COPY_TO;
@@ -38,17 +46,76 @@ public class MainActivity extends Activity {
     private static List items = new ArrayList<DirectoryItem>();
     protected static String path = "/";                              //path to the current directory
     private ListView listView;
-    private Button bNewFolder;
-    private Button bDelete;
-    private Button bCopy;
-    private Button bMove;
+//    private LinearLayout llNewFolder;
+    private LinearLayout llDelete;
+    private LinearLayout llCopy;
+    private LinearLayout bMove;
     private static boolean checkBoxVisibility = false;
+    private LinearLayout llButtons;
+    private ImageView ivRootDirectory;
 
     private RecyclerView horizontal_recycler_view;
     private static List<String> horizontalList;               //a list of buttons of folders, leading
     //to the current directory
     private static HorizontalAdapter horizontalAdapter;
 
+    public class HorizontalAdapter extends RecyclerView.Adapter<HorizontalAdapter.MyViewHolder> {
+        private List<String> horizontalList;
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView txtView;
+            public ImageView ivRootDirectory;
+
+            public MyViewHolder(View view) {
+                super(view);
+                txtView = (TextView) view.findViewById(R.id.txtView);
+            }
+        }
+
+        public HorizontalAdapter(List<String> horizontalList) {
+            this.horizontalList = horizontalList;
+        }
+
+        private String getQiuckPath(int index) {
+            String quickPath = "/";
+            for (int i = 0; i <= index; i++) {
+                quickPath += horizontalList.get(i) + "/";
+            }
+            return quickPath;
+        }
+
+        public void updateHorizontalList(List<String> horizontalList) {
+            this.horizontalList.clear();
+            this.horizontalList.addAll(horizontalList);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public HorizontalAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.horizontal_item_view, parent, false);
+            return new HorizontalAdapter.MyViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(final HorizontalAdapter.MyViewHolder holder, final int position) {
+            holder.txtView.setText(horizontalList.get(position));
+            holder.txtView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (position < horizontalList.size() - 1) {
+                        path = getQiuckPath(position);
+                        refreshList();
+                    }
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return horizontalList.size();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +130,7 @@ public class MainActivity extends Activity {
         directoryItemAdapter = new DirectoryItemAdapter(this, R.layout.layout_list_item);
         listView.setAdapter(directoryItemAdapter);
         refreshList();
+        Toast.makeText(MainActivity.this, "" + getCurrentPathButtonsList().size(), Toast.LENGTH_LONG).show();
     }
 
     public static boolean isCheckBoxVisibility() {
@@ -81,6 +149,7 @@ public class MainActivity extends Activity {
             checkBoxVisibility = false;
         else
             path = cutPath(path);
+        llButtons.setVisibility(View.GONE);
         refreshList();
 
     }
@@ -105,32 +174,14 @@ public class MainActivity extends Activity {
         }
         // Put the data into the lists
         horizontalList = getCurrentPathButtonsList();
+        if (horizontalList.size() > 1)
+            horizontalList.remove(0);
         horizontalAdapter.updateHorizontalList(horizontalList);
         directoryItemAdapter.updateList(items);
     }
 
     private static List<String> getCurrentPathButtonsList() {
-        List buttons = new ArrayList<String>();
-        buttons.add("/");
-        if (path.length() > 1) {
-            int i = 1;
-            String button = "";
-            while (i < path.length()) {
-                button += path.charAt(i);
-                if (path.charAt(i) == '/')
-                    break;
-                i++;
-            }
-            buttons.add(button);
-            button = "";
-            for (int j = i + 1; j < path.length(); j++) {
-                button += path.charAt(j);
-                if (path.charAt(j) == '/' || j == path.length() - 1) {
-                    buttons.add(button);
-                    button = "";
-                }
-            }
-        }
+        List<String> buttons = new ArrayList<String>(Arrays.asList(path.split("/")));
         return buttons;
     }
 
@@ -228,6 +279,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        llButtons.setVisibility(View.GONE);
         if (resultCode == RESULT_OK) {
             if (requestCode == INTENT_COPY) {
                 if (data.hasExtra(DIRECTORY_COPY_TO)) {
@@ -268,34 +320,43 @@ public class MainActivity extends Activity {
     private void setViews() {
         horizontal_recycler_view = (RecyclerView) findViewById(R.id.horizontal_recycler_view);
         listView = (ListView) findViewById(R.id.listView);
-        bNewFolder = (Button) findViewById(R.id.bNewFolder);
-        bNewFolder.setOnClickListener(new View.OnClickListener() {
-                                          @Override
-                                          public void onClick(View v) {
-                                              final EditText etFolderName = new EditText(MainActivity.this);
-                                              AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                              builder.setTitle("Enter new folder name")
-                                                      .setView(etFolderName)
-                                                      .setCancelable(false)
-                                                      .setPositiveButton("Create", new DialogInterface.OnClickListener() {
-                                                                  @Override
-                                                                  public void onClick(DialogInterface dialog, int which) {
-                                                                      makeNewFolder(etFolderName.getText().toString());
-                                                                  }
-                                                              }
-                                                      )
-                                                      .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                          public void onClick(DialogInterface dialog, int id) {
-                                                              dialog.cancel();
-                                                          }
-                                                      });
-                                              AlertDialog alert = builder.create();
-                                              alert.show();
-                                          }
-                                      }
-        );
-        bDelete = (Button) findViewById(R.id.bDelete);
-        bDelete.setOnClickListener(new View.OnClickListener() {
+        llButtons = (LinearLayout) findViewById(R.id.llButtons);
+        ivRootDirectory = (ImageView) findViewById(R.id.ivRootDirectory);
+        ivRootDirectory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                path = "/";
+                refreshList();
+            }
+        });
+//        bNewFolder = (Button) findViewById(R.id.bNewFolder);
+//        bNewFolder.setOnClickListener(new View.OnClickListener() {
+//                                          @Override
+//                                          public void onClick(View v) {
+//                                              final EditText etFolderName = new EditText(MainActivity.this);
+//                                              AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                                              builder.setTitle("Enter new folder name")
+//                                                      .setView(etFolderName)
+//                                                      .setCancelable(false)
+//                                                      .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+//                                                                  @Override
+//                                                                  public void onClick(DialogInterface dialog, int which) {
+//                                                                      makeNewFolder(etFolderName.getText().toString());
+//                                                                  }
+//                                                              }
+//                                                      )
+//                                                      .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                                                          public void onClick(DialogInterface dialog, int id) {
+//                                                              dialog.cancel();
+//                                                          }
+//                                                      });
+//                                              AlertDialog alert = builder.create();
+//                                              alert.show();
+//                                          }
+//                                      }
+//        );
+        llDelete = (LinearLayout) findViewById(R.id.llDelete);
+        llDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -324,8 +385,8 @@ public class MainActivity extends Activity {
                 alert.show();
             }
         });
-        bCopy = (Button) findViewById(R.id.bCopy);
-        bCopy.setOnClickListener(new View.OnClickListener() {
+        llCopy = (LinearLayout) findViewById(R.id.llCopy);
+        llCopy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getCountOfSelectedItems() > 0) {
@@ -336,7 +397,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        bMove = (Button) findViewById(R.id.bMove);
+        bMove = (LinearLayout) findViewById(R.id.llMove);
         bMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -367,9 +428,11 @@ public class MainActivity extends Activity {
                                             }
                                         }
         );
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                                                 @Override
                                                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                                                    llButtons.setVisibility(View.VISIBLE);
                                                     checkBoxVisibility = true;
                                                     DirectoryItem di = (DirectoryItem) items.get(position);
                                                     di.setSelected(true);

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="80dp"
     android:orientation="horizontal"
+    android:background="@color/colorWhite"
     android:weightSum="5">
 
     <ImageView
         android:id="@+id/ivIcon"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -18,20 +19,23 @@
 
         <TextView
             android:id="@+id/tvName"
+            android:singleLine="true"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:textColor="#090"
             android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tvLastModified"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textSize="11sp"/>
 
         <TextView
             android:id="@+id/tvSize"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textSize="11sp"/>
 
     </LinearLayout>
 
@@ -39,7 +43,8 @@
         android:id="@+id/cbSelected"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:visibility="gone"/>
 
 
 </LinearLayout>

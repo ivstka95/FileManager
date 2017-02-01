@@ -110,7 +110,9 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
         TextView tvLastModified = (TextView) view.findViewById(R.id.tvLastModified);
         tvLastModified.setText(list.get(position).getLastModified());
         TextView tvSize = (TextView) view.findViewById(R.id.tvSize);
-        tvSize.setText(list.get(position).getSize());
+        tvSize.setText("");
+        if (new File(file.getFilepath()).isFile())
+            tvSize.setText(list.get(position).getSize());
         final CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
         cbSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
