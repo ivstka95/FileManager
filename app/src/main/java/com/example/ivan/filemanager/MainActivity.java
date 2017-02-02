@@ -12,10 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -26,8 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +31,6 @@ import static com.example.ivan.filemanager.Constants.DIRECTORY_COPY_TO;
 import static com.example.ivan.filemanager.Constants.INTENT_COPY;
 import static com.example.ivan.filemanager.Constants.INTENT_MOVE;
 import static com.example.ivan.filemanager.Constants.PATH;
-import static java.security.AccessController.getContext;
 
 
 public class MainActivity extends Activity {
@@ -46,7 +39,6 @@ public class MainActivity extends Activity {
     private static List items = new ArrayList<DirectoryItem>();
     protected static String path = "/";                              //path to the current directory
     private ListView listView;
-//    private LinearLayout llNewFolder;
     private LinearLayout llDelete;
     private LinearLayout llCopy;
     private LinearLayout bMove;
@@ -130,7 +122,6 @@ public class MainActivity extends Activity {
         directoryItemAdapter = new DirectoryItemAdapter(this, R.layout.layout_list_item);
         listView.setAdapter(directoryItemAdapter);
         refreshList();
-        Toast.makeText(MainActivity.this, "" + getCurrentPathButtonsList().size(), Toast.LENGTH_LONG).show();
     }
 
     public static boolean isCheckBoxVisibility() {
@@ -151,7 +142,6 @@ public class MainActivity extends Activity {
             path = cutPath(path);
         llButtons.setVisibility(View.GONE);
         refreshList();
-
     }
 
     private String cutPath(String path) {
@@ -289,7 +279,6 @@ public class MainActivity extends Activity {
                             DirectoryItem di = (DirectoryItem) list.get(i);
                             try {
                                 copyFile(new File(list.get(i).getFilepath()), new File(data.getStringExtra(DIRECTORY_COPY_TO)));
-//                                copyDirectoryOneLocationToAnotherLocation(new File(list.get(i).getFilepath()), new File(data.getStringExtra(DIRECTORY_COPY_TO)));
                             } catch (Throwable throwable) {
 
                             }
@@ -329,32 +318,6 @@ public class MainActivity extends Activity {
                 refreshList();
             }
         });
-//        bNewFolder = (Button) findViewById(R.id.bNewFolder);
-//        bNewFolder.setOnClickListener(new View.OnClickListener() {
-//                                          @Override
-//                                          public void onClick(View v) {
-//                                              final EditText etFolderName = new EditText(MainActivity.this);
-//                                              AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//                                              builder.setTitle("Enter new folder name")
-//                                                      .setView(etFolderName)
-//                                                      .setCancelable(false)
-//                                                      .setPositiveButton("Create", new DialogInterface.OnClickListener() {
-//                                                                  @Override
-//                                                                  public void onClick(DialogInterface dialog, int which) {
-//                                                                      makeNewFolder(etFolderName.getText().toString());
-//                                                                  }
-//                                                              }
-//                                                      )
-//                                                      .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                                                          public void onClick(DialogInterface dialog, int id) {
-//                                                              dialog.cancel();
-//                                                          }
-//                                                      });
-//                                              AlertDialog alert = builder.create();
-//                                              alert.show();
-//                                          }
-//                                      }
-//        );
         llDelete = (LinearLayout) findViewById(R.id.llDelete);
         llDelete.setOnClickListener(new View.OnClickListener() {
             @Override

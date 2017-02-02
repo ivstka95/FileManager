@@ -1,24 +1,19 @@
 package com.example.ivan.filemanager;
 
 import android.content.Context;
-import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -30,8 +25,7 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
     private List<DirectoryItem> list;
     private Context context;
     private LayoutInflater inflater;
-    private boolean[] selectedItems;
-//    List selectedItems;
+    private boolean[] selectedItems; //    List selectedItems;
 
     public DirectoryItemAdapter(Context context, int resource) {
         super(context, resource);
