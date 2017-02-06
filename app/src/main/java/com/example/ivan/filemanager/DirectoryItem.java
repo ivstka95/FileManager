@@ -4,6 +4,7 @@ import android.widget.CheckBox;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -17,18 +18,59 @@ public class DirectoryItem {
     private boolean selected;
 
 
-
     public DirectoryItem(String path, String name, boolean selected) {
         this.name = name;
         this.path = path;
         this.selected = selected;
     }
 
+    public DirectoryItem(String filePath) {
+        int a = 0;
+        for (int i = filePath.length() - 1; i >= 0; i--) {
+            if (filePath.charAt(i) == '/') {
+                a = i;
+                break;
+            }
+        }
+        this.name = filePath.substring(a + 1);
+        this.path = filePath.substring(0, a);
+    }
+
+    // Comparator
+    public static class CompSize implements Comparator<DirectoryItem> {
+        @Override
+        public int compare(DirectoryItem di1, DirectoryItem di2) {
+            return (int) (new File(di1.getFilepath()).length()-(new File(di2.getFilepath()).length()));
+
+//            return new File(arg0.getFilepath()).length() - new File(arg1.getFilepath()).length();
+//            return arg0. - arg1.id;
+        }
+    }
+
+    public static class CompDate implements Comparator<DirectoryItem> {
+
+        @Override
+        public int compare(DirectoryItem di1, DirectoryItem di2) {
+            return Integer.valueOf(di1.getLastModified().compareTo(di2.getLastModified()));
+        }
+    }
+
+    public static class CompName implements Comparator<DirectoryItem> {
+
+        @Override
+        public int compare(DirectoryItem di1, DirectoryItem di2) {
+            return Integer.valueOf(di1.getName().compareTo(di2.getName()));
+        }
+    }
+
+
+
+
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
 
-    public boolean getSelected(){
+    public boolean getSelected() {
         return selected;
     }
 

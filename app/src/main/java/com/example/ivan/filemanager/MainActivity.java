@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,7 +30,12 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 
 import static com.example.ivan.filemanager.Constants.DIRECTORY_COPY_TO;
@@ -46,13 +53,17 @@ public class MainActivity extends Activity {
     private LinearLayout llDelete;
     private LinearLayout llCopy;
     private LinearLayout bMove;
+    private LinearLayout llShare;
+    private LinearLayout llAddToFavorites;
     private static boolean checkBoxVisibility = false;
     private LinearLayout llButtons;
     private ImageButton ibRootDirectory;
     private ImageButton ibNewFolder;
     private ImageButton ibSort;
     private ImageButton ibHome;
-    private LinearLayout llShare;
+
+
+    SharedPreferences sPref;
 
 
     private RecyclerView horizontal_recycler_view;
@@ -148,6 +159,8 @@ public class MainActivity extends Activity {
     public void onBackPressed() {
         if (checkBoxVisibility)
             checkBoxVisibility = false;
+        else if (path == "/")
+            finish();
         else
             path = cutPath(path);
         llButtons.setVisibility(View.GONE);
@@ -324,6 +337,25 @@ public class MainActivity extends Activity {
         context.startActivity(Intent.createChooser(intent, "Share"));
     }
 
+    private void addToFavorites(String s) {
+        sPref = getSharedPreferences("Favorites", MODE_PRIVATE);
+        Set<String> favoriteFiles = sPref.getStringSet("listOfFavorites", getFavorites());
+        if (favoriteFiles == null)
+            favoriteFiles = new HashSet<>();
+        favoriteFiles.add(s);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putStringSet("listOfFavorites", favoriteFiles);
+        ed.commit();
+        Toast.makeText(this, "Favorite saved", Toast.LENGTH_SHORT).show();
+    }
+
+    private Set<String> getFavorites() {
+        sPref = getSharedPreferences("Favorites", MODE_PRIVATE);
+        Set<String> favoriteFiles = sPref.getStringSet("listOfFavorites", null);
+        Toast.makeText(this, "Favorite loaded", Toast.LENGTH_SHORT).show();
+        return favoriteFiles;
+    }
+
     //a method sets views
     private void setViews() {
         horizontal_recycler_view = (RecyclerView) findViewById(R.id.horizontal_recycler_view);
@@ -333,6 +365,13 @@ public class MainActivity extends Activity {
         llShare = (LinearLayout) findViewById(R.id.llShare);
         ibNewFolder = (ImageButton) findViewById(R.id.ibNewFolder);
         ibSort = (ImageButton) findViewById(R.id.ibSort);
+        ibSort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collections.sort(items, new DirectoryItem.CompSize());
+                directoryItemAdapter.updateList(items);
+            }
+        });
         ibHome = (ImageButton) findViewById(R.id.ibHome);
         ibHome.setOnClickListener((v) -> {
             setResult(RESULT_OK);
@@ -360,6 +399,21 @@ public class MainActivity extends Activity {
             alert.show();
 
         });
+        llAddToFavorites = (LinearLayout) findViewById(R.id.llAddToFavorites);
+        llAddToFavorites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<DirectoryItem> list = directoryItemAdapter.getList();
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).getSelected()) {
+                        DirectoryItem di = list.get(i);
+                        addToFavorites(di.getFilepath());
+                    }
+                }
+                checkBoxVisibility = false;
+                refreshList();
+            }
+        });
         llShare.setOnClickListener((v) -> {
             Toast.makeText(MainActivity.this, "share", Toast.LENGTH_LONG).show();
             List<DirectoryItem> list = directoryItemAdapter.getList();
@@ -369,7 +423,6 @@ public class MainActivity extends Activity {
                     filesToShare.add(Uri.fromFile(new File(list.get(i).getFilepath())));
                 }
             shareMultiple(filesToShare, MainActivity.this);
-
         });
         llDelete = (LinearLayout) findViewById(R.id.llDelete);
         llDelete.setOnClickListener(new View.OnClickListener() {

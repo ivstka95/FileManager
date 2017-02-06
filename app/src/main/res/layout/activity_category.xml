@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_category"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="25">
+    tools:context="com.example.ivan.filemanager.SearchActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/searchToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#1E90FF"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <ImageButton
+            android:id="@+id/ibHome"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/home" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:textColor="@color/colorWhite"
+            android:text="Favorite files"/>
+    </android.support.v7.widget.Toolbar>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="25" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:background="@color/colorGrey"></LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llButtons"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_gravity="bottom"
+        android:background="@color/colorWhite"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="3dp"
+                android:background="@drawable/remove_from_favorites" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Remove from favorites" />
+
+    </LinearLayout>
+</LinearLayout>
