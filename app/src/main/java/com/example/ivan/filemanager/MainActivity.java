@@ -1,6 +1,7 @@
 package com.example.ivan.filemanager;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -279,7 +280,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         llButtons.setVisibility(View.GONE);
-        if (resultCode==RESULT_CANCELED)
+        if (resultCode == RESULT_CANCELED)
             finish();
         if (resultCode == RESULT_OK) {
             if (requestCode == INTENT_COPY) {
@@ -314,6 +315,13 @@ public class MainActivity extends Activity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public static void shareMultiple(ArrayList<Uri> files, Context context) {
+        final Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        intent.setType("*/*");
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+        context.startActivity(Intent.createChooser(intent, "Share"));
     }
 
     //a method sets views
@@ -355,16 +363,12 @@ public class MainActivity extends Activity {
         llShare.setOnClickListener((v) -> {
             Toast.makeText(MainActivity.this, "share", Toast.LENGTH_LONG).show();
             List<DirectoryItem> list = directoryItemAdapter.getList();
-            for (int i = 0; i < list.size(); i++) {
+            ArrayList<Uri> filesToShare = new ArrayList<Uri>();
+            for (int i = 0; i < list.size(); i++)
                 if (list.get(i).getSelected()) {
-                    DirectoryItem di = (DirectoryItem) list.get(i);
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(di.getFilepath())));
-                    shareIntent.setType("image/jpg");
-                    startActivity(Intent.createChooser(shareIntent, "Share"));
+                    filesToShare.add(Uri.fromFile(new File(list.get(i).getFilepath())));
                 }
-            }
+            shareMultiple(filesToShare, MainActivity.this);
 
         });
         llDelete = (LinearLayout) findViewById(R.id.llDelete);
