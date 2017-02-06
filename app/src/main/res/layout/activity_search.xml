@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="25">
+    tools:context="com.example.ivan.filemanager.SearchActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/mainToolbar"
+        android:id="@+id/searchToolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="#1E90FF"
@@ -19,56 +22,14 @@
             android:layout_height="50dp"
             android:background="@drawable/home" />
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:paddingLeft="16dp"
-            android:text="All files"
-            android:textColor="@color/colorWhite"
-            android:textSize="18sp" />
-
-        <ImageButton
-            android:id="@+id/ibNewFolder"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="right"
-            android:background="@drawable/new_folder" />
-
-        <ImageButton
-            android:id="@+id/ibSort"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="right"
-            android:background="@drawable/sort" />
-
-    </android.support.v7.widget.Toolbar>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/ibRootDirectory"
-            android:layout_width="33dp"
-            android:layout_height="30dp"
-            android:background="@drawable/root_directory" />
-
-        <ImageView
-            android:layout_width="15dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/arrow" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/horizontal_recycler_view"
+        <EditText
+            android:id="@+id/etSearch"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:background="#F0F8FF" />
-    </LinearLayout>
-
+            android:layout_height="wrap_content"
+            android:hint="search request"
+            android:paddingLeft="16dp"
+            android:textColor="@color/colorWhite" />
+    </android.support.v7.widget.Toolbar>
 
     <ListView
         android:id="@+id/listView"
@@ -204,6 +165,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
 
+    </LinearLayout>
 </LinearLayout>

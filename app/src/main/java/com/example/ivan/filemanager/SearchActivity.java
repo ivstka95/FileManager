@@ -1,23 +1,23 @@
 package com.example.ivan.filemanager;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -29,106 +29,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.example.ivan.filemanager.Constants.DIRECTORY_COPY_TO;
 import static com.example.ivan.filemanager.Constants.INTENT_COPY;
+import static com.example.ivan.filemanager.Constants.INTENT_MAIN;
 import static com.example.ivan.filemanager.Constants.INTENT_MOVE;
 import static com.example.ivan.filemanager.Constants.PATH;
 
-
-public class MainActivity extends Activity {
-
+public class SearchActivity extends AppCompatActivity {
     private static DirectoryItemAdapter directoryItemAdapter;
     private static List items = new ArrayList<DirectoryItem>();
-    protected static String path = "/";                              //path to the current directory
     private ListView listView;
     private LinearLayout llDelete;
     private LinearLayout llCopy;
     private LinearLayout bMove;
     private static boolean checkBoxVisibility = false;
     private LinearLayout llButtons;
-    private ImageButton ibRootDirectory;
-    private ImageButton ibNewFolder;
-    private ImageButton ibSort;
-    private ImageButton ibHome;
     private LinearLayout llShare;
+    private EditText etSearch;
+    private ImageButton ibHome;
 
-
-    private RecyclerView horizontal_recycler_view;
-    private static List<String> horizontalList;               //a list of buttons of folders, leading
-    //to the current directory
-    private static HorizontalAdapter horizontalAdapter;
-
-    public class HorizontalAdapter extends RecyclerView.Adapter<HorizontalAdapter.MyViewHolder> {
-        private List<String> horizontalList;
-
-        public class MyViewHolder extends RecyclerView.ViewHolder {
-            public TextView txtView;
-            public ImageView ivRootDirectory;
-
-            public MyViewHolder(View view) {
-                super(view);
-                txtView = (TextView) view.findViewById(R.id.txtView);
-            }
-        }
-
-        public HorizontalAdapter(List<String> horizontalList) {
-            this.horizontalList = horizontalList;
-        }
-
-        private String getQiuckPath(int index) {
-            String quickPath = "/";
-            for (int i = 0; i <= index; i++) {
-                quickPath += horizontalList.get(i) + "/";
-            }
-            return quickPath;
-        }
-
-        public void updateHorizontalList(List<String> horizontalList) {
-            this.horizontalList.clear();
-            this.horizontalList.addAll(horizontalList);
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public HorizontalAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.horizontal_item_view, parent, false);
-            return new HorizontalAdapter.MyViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(final HorizontalAdapter.MyViewHolder holder, final int position) {
-            holder.txtView.setText(horizontalList.get(position));
-            holder.txtView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (position < horizontalList.size() - 1) {
-                        path = getQiuckPath(position);
-                        refreshList();
-                    }
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return horizontalList.size();
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        if (getIntent().hasExtra(PATH))
-            path = getIntent().getStringExtra(PATH);
+        setContentView(R.layout.activity_search);
         setViews();
-        horizontalAdapter = new HorizontalAdapter(getCurrentPathButtonsList());
-        LinearLayoutManager horizontalLayoutManagaer
-                = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
-        horizontal_recycler_view.setLayoutManager(horizontalLayoutManagaer);
-        horizontal_recycler_view.setAdapter(horizontalAdapter);
         directoryItemAdapter = new DirectoryItemAdapter(this, R.layout.layout_list_item);
         listView.setAdapter(directoryItemAdapter);
     }
@@ -139,7 +67,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onResume() {
-        refreshList();
+//        refreshList();
         super.onResume();
     }
 
@@ -147,10 +75,9 @@ public class MainActivity extends Activity {
     public void onBackPressed() {
         if (checkBoxVisibility)
             checkBoxVisibility = false;
-        else
-            path = cutPath(path);
+        if (etSearch.getText().toString().length() == 0)
+            finish();
         llButtons.setVisibility(View.GONE);
-        refreshList();
     }
 
     private String cutPath(String path) {
@@ -160,51 +87,22 @@ public class MainActivity extends Activity {
         return path;
     }
 
-    private void refreshList() {
-        items.clear();
+    public static void refreshList(String s, String path) {
         File dir = new File(path);
         String[] list = dir.list();
         if (list != null) {
             for (String file : list) {
-                if (!file.startsWith(".")) {
-                    items.add(new DirectoryItem(path, file, false));
+                DirectoryItem di = new DirectoryItem(path, file, false);
+                if (!file.startsWith(".") && file.contains(s)) {
+                    items.add(di);
+                    directoryItemAdapter.updateList(items);
                 }
+//                if (new File(di.getFilepath()).isDirectory())
+//                    refreshList(s, di.getFilepath());
             }
         }
-        // Put the data into the lists
-        horizontalList = getCurrentPathButtonsList();
-        if (horizontalList.size() > 1)
-            horizontalList.remove(0);
-        horizontalAdapter.updateHorizontalList(horizontalList);
-        directoryItemAdapter.updateList(items);
+        // Put the data into the list
     }
-
-    private static List<String> getCurrentPathButtonsList() {
-        List<String> buttons = new ArrayList<String>(Arrays.asList(path.split("/")));
-        return buttons;
-    }
-
-    private void makeNewFolder(String folder) {
-        File file = null;
-        boolean bool = false;
-        String filepath;
-        if (path.endsWith(File.separator)) {
-            filepath = path + folder;
-        } else {
-            filepath = path + File.separator + folder;
-        }
-        try {
-            file = new File(filepath);
-            bool = file.mkdir();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (bool) {
-            Toast.makeText(MainActivity.this, "Created " + folder, Toast.LENGTH_LONG).show();
-            refreshList();
-        }
-    }
-
 
     private int getCountOfSelectedItems() {
         int count = 0;
@@ -276,10 +174,11 @@ public class MainActivity extends Activity {
         }
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         llButtons.setVisibility(View.GONE);
-        if (resultCode==RESULT_CANCELED)
+        if (requestCode == INTENT_MAIN && resultCode == RESULT_OK)
             finish();
         if (resultCode == RESULT_OK) {
             if (requestCode == INTENT_COPY) {
@@ -318,42 +217,35 @@ public class MainActivity extends Activity {
 
     //a method sets views
     private void setViews() {
-        horizontal_recycler_view = (RecyclerView) findViewById(R.id.horizontal_recycler_view);
-        listView = (ListView) findViewById(R.id.listView);
-        llButtons = (LinearLayout) findViewById(R.id.llButtons);
-        ibRootDirectory = (ImageButton) findViewById(R.id.ibRootDirectory);
-        llShare = (LinearLayout) findViewById(R.id.llShare);
-        ibNewFolder = (ImageButton) findViewById(R.id.ibNewFolder);
-        ibSort = (ImageButton) findViewById(R.id.ibSort);
         ibHome = (ImageButton) findViewById(R.id.ibHome);
         ibHome.setOnClickListener((v) -> {
-            setResult(RESULT_OK);
             finish();
         });
-        ibNewFolder.setOnClickListener((v) -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            EditText etNewFolderName = new EditText(MainActivity.this);
-            builder.setTitle("Enter folder name")
-                    .setView(etNewFolderName)
-                    .setPositiveButton("Create", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    makeNewFolder(etNewFolderName.getText().toString());
-                                    refreshList();
-                                }
-                            }
-                    )
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
+        etSearch = (EditText) findViewById(R.id.etSearch);
+        etSearch.addTextChangedListener(new TextWatcher() {
 
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                Toast.makeText(SearchActivity.this, "on" + s, Toast.LENGTH_LONG).show();
+                items.clear();
+                directoryItemAdapter.updateList(items);
+                refreshList(s.toString(), "/");
+            }
         });
+        listView = (ListView) findViewById(R.id.listView);
+        llButtons = (LinearLayout) findViewById(R.id.llButtons);
+        llShare = (LinearLayout) findViewById(R.id.llShare);
         llShare.setOnClickListener((v) -> {
-            Toast.makeText(MainActivity.this, "share", Toast.LENGTH_LONG).show();
             List<DirectoryItem> list = directoryItemAdapter.getList();
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).getSelected()) {
@@ -371,7 +263,7 @@ public class MainActivity extends Activity {
         llDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
                 builder.setTitle("Delete " + getCountOfSelectedItems() + " items?")
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                     @Override
@@ -384,7 +276,7 @@ public class MainActivity extends Activity {
                                             }
                                         }
                                         checkBoxVisibility = false;
-                                        refreshList();
+//                                        refreshList();
                                     }
                                 }
                         )
@@ -403,8 +295,8 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 if (getCountOfSelectedItems() > 0) {
                     checkBoxVisibility = false;
-                    Intent intent = new Intent(MainActivity.this, CopyMoveActivity.class);
-                    intent.putExtra(PATH, path);
+                    Intent intent = new Intent(SearchActivity.this, CopyMoveActivity.class);
+//                    intent.putExtra(PATH, path);
                     startActivityForResult(intent, INTENT_COPY);
                 }
             }
@@ -415,15 +307,11 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 if (getCountOfSelectedItems() > 0) {
                     checkBoxVisibility = false;
-                    Intent intent = new Intent(MainActivity.this, CopyMoveActivity.class);
-                    intent.putExtra(PATH, path);
+                    Intent intent = new Intent(SearchActivity.this, CopyMoveActivity.class);
+//                    intent.putExtra(PATH, path);
                     startActivityForResult(intent, INTENT_MOVE);
                 }
             }
-        });
-        ibRootDirectory.setOnClickListener((v) -> {
-            path = "/";
-            refreshList();
         });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                             @Override
@@ -432,8 +320,9 @@ public class MainActivity extends Activity {
                                                 String filename = file.getFilepath();
                                                 File intentFile = new File(filename);
                                                 if (intentFile.isDirectory()) {
-                                                    path = filename;
-                                                    refreshList();
+                                                    Intent directoryIntent = new Intent(SearchActivity.this, MainActivity.class);
+                                                    directoryIntent.putExtra(PATH, filename);
+                                                    startActivityForResult(directoryIntent, INTENT_MAIN);
                                                 }
                                                 if (intentFile.isFile()) {
                                                     Intent intent = new Intent();

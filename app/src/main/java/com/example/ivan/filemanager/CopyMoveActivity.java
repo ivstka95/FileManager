@@ -1,14 +1,18 @@
 package com.example.ivan.filemanager;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -19,6 +23,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.example.ivan.filemanager.Constants.DIRECTORY_COPY_TO;
 import static com.example.ivan.filemanager.Constants.PATH;
@@ -31,7 +38,9 @@ public class CopyMoveActivity extends Activity {
     private ListView listView;
     private LinearLayout llCancel;
     private LinearLayout llPasteHere;
-    private ImageView ivRootDirectory;
+    private ImageButton ibRootDirectory;
+    private ImageButton ibNewFolder;
+    private ImageButton ibHome;
 
 
     private RecyclerView horizontal_recycler_view;
@@ -102,6 +111,7 @@ public class CopyMoveActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_copy_move);
         setViews();
+        ButterKnife.bind(this);
         horizontalAdapter = new HorizontalAdapter(getCurrentPathButtonsList());
         LinearLayoutManager horizontalLayoutManagaer
                 = new LinearLayoutManager(CopyMoveActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -176,18 +186,18 @@ public class CopyMoveActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (bool) {
-            Toast.makeText(CopyMoveActivity.this, "Created " + folder, Toast.LENGTH_LONG).show();
-            refreshList();
-        }
+//        if (bool) {
+//            Toast.makeText(CopyMoveActivity.this, "Created " + folder, Toast.LENGTH_LONG).show();
+//            refreshList();
+//        }
     }
 
     //a method sets views
     private void setViews() {
         horizontal_recycler_view = (RecyclerView) findViewById(R.id.horizontal_recycler_view2);
         listView = (ListView) findViewById(R.id.listView2);
-        ivRootDirectory = (ImageView) findViewById(R.id.ivRootDirectory);
-        ivRootDirectory.setOnClickListener(new View.OnClickListener() {
+        ibRootDirectory = (ImageButton) findViewById(R.id.ibRootDirectory);
+        ibRootDirectory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 path = "/";
@@ -195,6 +205,35 @@ public class CopyMoveActivity extends Activity {
             }
         });
 
+        ibHome = (ImageButton) findViewById(R.id.ibHome);
+        ibHome.setOnClickListener((v) -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
+        ibNewFolder = (ImageButton) findViewById(R.id.ibNewFolder);
+
+        ibNewFolder.setOnClickListener((v) -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(CopyMoveActivity.this);
+            EditText etNewFolderName = new EditText(CopyMoveActivity.this);
+            builder.setTitle("Enter folder name")
+                    .setView(etNewFolderName)
+                    .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    makeNewFolder(etNewFolderName.getText().toString());
+                                    refreshList();
+                                }
+                            }
+                    )
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+
+        });
         llCancel = (LinearLayout) findViewById(R.id.llCancel);
         llCancel.setOnClickListener(new View.OnClickListener() {
             @Override
