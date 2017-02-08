@@ -15,9 +15,10 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+import static com.example.ivan.filemanager.Constants.DIRECTORY_COPY_TO;
 import static com.example.ivan.filemanager.Constants.INTENT_MAIN;
+import static com.example.ivan.filemanager.Constants.LIST_OF_FAVORITES;
 import static com.example.ivan.filemanager.Constants.PATH;
 
 public class CategoryActivity extends AppCompatActivity {
@@ -27,6 +28,7 @@ public class CategoryActivity extends AppCompatActivity {
     private static boolean checkBoxVisibility = false;
     private LinearLayout llButtons;
     private ImageButton ibHome;
+    private SharedPreferencesHelper spHelper;
 
 
     @Override
@@ -34,8 +36,10 @@ public class CategoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
         setViews();
+        spHelper = new SharedPreferencesHelper(CategoryActivity.this);
         directoryItemAdapter = new DirectoryItemAdapter(this, R.layout.layout_list_item);
         listView.setAdapter(directoryItemAdapter);
+        refreshList();
     }
 
     public static boolean isCheckBoxVisibility() {
@@ -45,7 +49,6 @@ public class CategoryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         Toast.makeText(this, "OnResume", Toast.LENGTH_SHORT).show();
-        refreshList();
         super.onResume();
     }
 
@@ -57,17 +60,11 @@ public class CategoryActivity extends AppCompatActivity {
         llButtons.setVisibility(View.GONE);
     }
 
-    private Set<String> getFavorites() {
-        SharedPreferences sPref = getSharedPreferences("Favorites", MODE_PRIVATE);
-        Set<String> favoriteFiles = sPref.getStringSet("listOfFavorites", null);
-        Toast.makeText(this, "Favorite loaded", Toast.LENGTH_SHORT).show();
-        return favoriteFiles;
-    }
 
     public void refreshList() {
         items.clear();
-        List<String> favorites = new ArrayList<String>(getFavorites());
-        for (String s: favorites) {
+        List<String> favorites = new ArrayList<String>(spHelper.getFavorites());
+        for (String s : favorites) {
             items.add(new DirectoryItem(s));
         }
         directoryItemAdapter.updateList(items);

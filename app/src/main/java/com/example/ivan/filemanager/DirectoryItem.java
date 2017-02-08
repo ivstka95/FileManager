@@ -59,7 +59,7 @@ public class DirectoryItem {
 
         @Override
         public int compare(DirectoryItem di1, DirectoryItem di2) {
-            return Integer.valueOf(di1.getName().compareTo(di2.getName()));
+            return Integer.valueOf(di1.getName().compareToIgnoreCase(di2.getName()));
         }
     }
 

@@ -2,14 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:orientation="horizontal"
     android:background="@color/colorWhite"
+    android:orientation="horizontal"
     android:weightSum="5">
 
-    <ImageView
-        android:id="@+id/ivIcon"
+    <RelativeLayout
         android:layout_width="80dp"
-        android:layout_height="80dp" />
+        android:layout_height="80dp">
+
+
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
+
+        <ImageView
+            android:id="@+id/ivIconType"
+            android:layout_width="25dp"
+            android:layout_height="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -19,9 +36,9 @@
 
         <TextView
             android:id="@+id/tvName"
-            android:singleLine="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:singleLine="true"
             android:textColor="#090"
             android:textSize="20sp" />
 
@@ -29,13 +46,13 @@
             android:id="@+id/tvLastModified"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"/>
+            android:textSize="11sp" />
 
         <TextView
             android:id="@+id/tvSize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"/>
+            android:textSize="11sp" />
 
     </LinearLayout>
 
@@ -44,7 +61,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 
 </LinearLayout>

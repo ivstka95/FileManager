@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -61,9 +61,10 @@ public class MainActivity extends Activity {
     private ImageButton ibNewFolder;
     private ImageButton ibSort;
     private ImageButton ibHome;
-
-
-    SharedPreferences sPref;
+    private Comparator comparator;
+    private String[] sortVariants = {"Size", "Date", "Name"};
+    private SharedPreferencesHelper spHelper;
+    private SharedPreferences sPref;
 
 
     private RecyclerView horizontal_recycler_view;
@@ -136,6 +137,8 @@ public class MainActivity extends Activity {
         if (getIntent().hasExtra(PATH))
             path = getIntent().getStringExtra(PATH);
         setViews();
+        spHelper = new SharedPreferencesHelper(MainActivity.this);
+
         horizontalAdapter = new HorizontalAdapter(getCurrentPathButtonsList());
         LinearLayoutManager horizontalLayoutManagaer
                 = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -190,6 +193,8 @@ public class MainActivity extends Activity {
         if (horizontalList.size() > 1)
             horizontalList.remove(0);
         horizontalAdapter.updateHorizontalList(horizontalList);
+        if (comparator != null)
+            Collections.sort(items, comparator);
         directoryItemAdapter.updateList(items);
     }
 
@@ -337,24 +342,6 @@ public class MainActivity extends Activity {
         context.startActivity(Intent.createChooser(intent, "Share"));
     }
 
-    private void addToFavorites(String s) {
-        sPref = getSharedPreferences("Favorites", MODE_PRIVATE);
-        Set<String> favoriteFiles = sPref.getStringSet("listOfFavorites", getFavorites());
-        if (favoriteFiles == null)
-            favoriteFiles = new HashSet<>();
-        favoriteFiles.add(s);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putStringSet("listOfFavorites", favoriteFiles);
-        ed.commit();
-        Toast.makeText(this, "Favorite saved", Toast.LENGTH_SHORT).show();
-    }
-
-    private Set<String> getFavorites() {
-        sPref = getSharedPreferences("Favorites", MODE_PRIVATE);
-        Set<String> favoriteFiles = sPref.getStringSet("listOfFavorites", null);
-        Toast.makeText(this, "Favorite loaded", Toast.LENGTH_SHORT).show();
-        return favoriteFiles;
-    }
 
     //a method sets views
     private void setViews() {
@@ -368,8 +355,26 @@ public class MainActivity extends Activity {
         ibSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Collections.sort(items, new DirectoryItem.CompSize());
-                directoryItemAdapter.updateList(items);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Sort by")
+                        .setIcon(R.drawable.sort)
+                        .setItems(sortVariants, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == 0)
+                                    comparator = new DirectoryItem.CompSize();
+                                if (which == 1)
+                                    comparator = new DirectoryItem.CompDate();
+                                if (which == 2)
+                                    comparator = new DirectoryItem.CompName();
+                                Toast.makeText(MainActivity.this, sortVariants[which], Toast.LENGTH_LONG).show();
+                                Collections.sort(items, comparator);
+                                directoryItemAdapter.updateList(items);
+                            }
+                        });
+
+                builder.create();
+                builder.show();
             }
         });
         ibHome = (ImageButton) findViewById(R.id.ibHome);
@@ -406,8 +411,8 @@ public class MainActivity extends Activity {
                 List<DirectoryItem> list = directoryItemAdapter.getList();
                 for (int i = 0; i < list.size(); i++) {
                     if (list.get(i).getSelected()) {
-                        DirectoryItem di = list.get(i);
-                        addToFavorites(di.getFilepath());
+                        spHelper.addToFavorites(list.get(i).getFilepath());
+
                     }
                 }
                 checkBoxVisibility = false;
