@@ -111,7 +111,6 @@ public class CopyMoveActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_copy_move);
         setViews();
-        ButterKnife.bind(this);
         horizontalAdapter = new HorizontalAdapter(getCurrentPathButtonsList());
         LinearLayoutManager horizontalLayoutManagaer
                 = new LinearLayoutManager(CopyMoveActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -123,8 +122,6 @@ public class CopyMoveActivity extends Activity {
             this.path = getIntent().getStringExtra(PATH);
         }
         Toast.makeText(CopyMoveActivity.this, path, Toast.LENGTH_LONG).show();
-
-        refreshList();
     }
 
     @Override
@@ -135,7 +132,10 @@ public class CopyMoveActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        path = cutPath(path);
+        if (path.equals("/"))
+            finish();
+        else
+            path = cutPath(path);
         refreshList();
 
     }
@@ -158,7 +158,6 @@ public class CopyMoveActivity extends Activity {
                 }
             }
         }
-        // Put the data into the lists
         horizontalList = getCurrentPathButtonsList();
         if (horizontalList.size() > 1)
             horizontalList.remove(0);
@@ -186,10 +185,6 @@ public class CopyMoveActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        if (bool) {
-//            Toast.makeText(CopyMoveActivity.this, "Created " + folder, Toast.LENGTH_LONG).show();
-//            refreshList();
-//        }
     }
 
     //a method sets views
@@ -238,7 +233,6 @@ public class CopyMoveActivity extends Activity {
         llCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(RESULT_CANCELED);
                 finish();
             }
         });

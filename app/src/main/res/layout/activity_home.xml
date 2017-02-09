@@ -33,7 +33,6 @@
             android:textSize="18sp" />
 
 
-
         <ImageButton
             android:id="@+id/ibSearch"
             android:layout_width="50dp"
@@ -44,12 +43,12 @@
 
 
     <LinearLayout
-        android:id="@+id/llImages"
+        android:id="@+id/llPictures"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="50dp">
 
         <ImageView
             android:layout_width="100dp"
@@ -75,9 +74,9 @@
         android:id="@+id/llMusic"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="50dp">
 
         <ImageView
             android:layout_width="100dp"
@@ -104,9 +103,9 @@
         android:id="@+id/llVideos"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="50dp">
 
         <ImageView
             android:layout_width="100dp"
@@ -133,9 +132,9 @@
         android:id="@+id/llDocuments"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="50dp">
 
         <ImageView
             android:layout_width="100dp"
@@ -162,9 +161,9 @@
         android:id="@+id/llFavourites"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="50dp">
 
         <ImageView
             android:layout_width="100dp"
@@ -190,9 +189,9 @@
         android:id="@+id/llAllFiles"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="50dp">
 
         <ImageView
             android:layout_width="100dp"

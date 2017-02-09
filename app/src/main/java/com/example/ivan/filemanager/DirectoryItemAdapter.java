@@ -1,9 +1,6 @@
 package com.example.ivan.filemanager;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -15,8 +12,9 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +24,11 @@ import java.util.List;
  */
 
 public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
+    protected boolean isCheckBoxVisibility = false;
     private List<DirectoryItem> list;
     private Context context;
     private LayoutInflater inflater;
-    private boolean[] selectedItems; //    List selectedItems;
+    private boolean[] selectedItems;
 
     public DirectoryItemAdapter(Context context, int resource) {
         super(context, resource);
@@ -83,84 +82,136 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
                     file.getType().equalsIgnoreCase(".js") || file.getType().equalsIgnoreCase(".pl") ||
                     file.getType().equalsIgnoreCase(".txt") || file.getType().equalsIgnoreCase(".xml")) {
                 ivImageType.setVisibility(View.GONE);
-                ivIcon.setImageResource(R.drawable.txt);
+                Picasso.with(context)
+                        .load(R.drawable.txt)
+                        .fit()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".doc") || file.getType().equalsIgnoreCase(".docx") ||
                     file.getType().equalsIgnoreCase(".word")) {
                 ivImageType.setVisibility(View.GONE);
-                ivIcon.setImageResource(R.drawable.msword);
+                Picasso.with(context)
+                        .load(R.drawable.msword)
+                        .fit()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".pdf")) {
                 ivImageType.setVisibility(View.GONE);
-                ivIcon.setImageResource(R.drawable.pdf);
+                Picasso.with(context)
+                        .load(R.drawable.pdf)
+                        .fit()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".mid") || file.getType().equalsIgnoreCase(".mp2") ||
                     file.getType().equalsIgnoreCase(".mp3") || file.getType().equalsIgnoreCase(".wav")) {
                 ivImageType.setVisibility(View.GONE);
-                ivIcon.setImageResource(R.drawable.audio);
+                Picasso.with(context)
+                        .load(R.drawable.audio)
+                        .fit()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".bmp")) {
                 ivImageType.setVisibility(View.VISIBLE);
                 ivImageType.setImageResource(R.drawable.bmp);
-                ivIcon.setImageURI(Uri.parse(file.getFilepath()));
+                Picasso.with(context)
+                        .load(new File(file.getFilepath()))
+                        .resize(80, 80)
+                        .centerCrop().fit()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".gif")) {
                 ivImageType.setVisibility(View.VISIBLE);
                 ivImageType.setImageResource(R.drawable.gif);
-                ivIcon.setImageURI(Uri.parse(file.getFilepath()));
+                Picasso.with(context)
+                        .load(new File(file.getFilepath()))
+                        .resize(80, 80)
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".jpe")) {
                 ivImageType.setVisibility(View.VISIBLE);
                 ivImageType.setImageResource(R.drawable.jpe);
-                ivIcon.setImageURI(Uri.parse(file.getFilepath()));
+                Picasso.with(context)
+                        .load(new File(file.getFilepath()))
+                        .resize(80, 80)
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".jpeg")) {
                 ivImageType.setVisibility(View.VISIBLE);
                 ivImageType.setImageResource(R.drawable.jpeg);
-                ivIcon.setImageURI(Uri.parse(file.getFilepath()));
+                Picasso.with(context)
+                        .load(new File(file.getFilepath()))
+                        .resize(80, 80)
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".jpg")) {
                 ivImageType.setVisibility(View.VISIBLE);
                 ivImageType.setImageResource(R.drawable.jpg);
-                ivIcon.setImageURI(Uri.parse(file.getFilepath()));
+                Picasso.with(context)
+                        .load(new File(file.getFilepath()))
+                        .resize(80, 80)
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".pic")) {
                 ivImageType.setVisibility(View.VISIBLE);
                 ivImageType.setImageResource(R.drawable.pic);
-                ivIcon.setImageURI(Uri.parse(file.getFilepath()));
+                Picasso.with(context)
+                        .load(new File(file.getFilepath()))
+                        .resize(80, 80)
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".png")) {
                 ivImageType.setVisibility(View.VISIBLE);
                 ivImageType.setImageResource(R.drawable.png);
-                ivIcon.setImageURI(Uri.parse(file.getFilepath()));
+                Picasso.with(context)
+                        .load(new File(file.getFilepath()))
+                        .resize(80, 80)
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".avi") || file.getType().equalsIgnoreCase(".mjpg") ||
                     file.getType().equalsIgnoreCase(".mpeg") || file.getType().equalsIgnoreCase(".mpg") ||
                     file.getType().equalsIgnoreCase(".mp4")) {
                 ivImageType.setVisibility(View.GONE);
-                ivIcon.setImageResource(R.drawable.video);
+                Picasso.with(context)
+                        .load(R.drawable.video)
+                        .fit()
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
             if (file.getType().equalsIgnoreCase(".zip")) {
                 ivImageType.setVisibility(View.GONE);
-                ivIcon.setImageResource(R.drawable.zip);
+                Picasso.with(context)
+                        .load(R.drawable.zip)
+                        .fit()
+                        .centerCrop()
+                        .into(ivIcon);
                 imageSet = true;
             }
         }
         if (!imageSet) {
             ivImageType.setVisibility(View.GONE);
-            ivIcon.setImageResource(R.drawable.file);
+            Picasso.with(context)
+                    .load(R.drawable.file)
+                    .fit()
+                    .centerCrop()
+                    .into(ivIcon);
         }
 
         TextView tvName = (TextView) view.findViewById(R.id.tvName);
@@ -185,14 +236,10 @@ public class DirectoryItemAdapter extends ArrayAdapter<DirectoryItem> {
                                               }
 
         );
-        if (MainActivity.isCheckBoxVisibility())
+        if (isCheckBoxVisibility)
             cbSelected.setVisibility(View.VISIBLE);
         else cbSelected.setVisibility(View.GONE);
-        cbSelected.setChecked(list.get(position).
-
-                getSelected()
-
-        );
+        cbSelected.setChecked(list.get(position).getSelected());
         return view;
     }
 }

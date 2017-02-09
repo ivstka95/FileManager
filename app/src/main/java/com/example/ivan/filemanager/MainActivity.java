@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -29,47 +28,40 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 
 import static com.example.ivan.filemanager.Constants.DIRECTORY_COPY_TO;
 import static com.example.ivan.filemanager.Constants.INTENT_COPY;
 import static com.example.ivan.filemanager.Constants.INTENT_MOVE;
 import static com.example.ivan.filemanager.Constants.PATH;
+import static com.example.ivan.filemanager.FileWriterReader.write;
 
 
 public class MainActivity extends Activity {
 
-    private static DirectoryItemAdapter directoryItemAdapter;
-    private static List items = new ArrayList<DirectoryItem>();
-    protected static String path = "/";                              //path to the current directory
+    private DirectoryItemAdapter directoryItemAdapter;
+    private List items = new ArrayList<DirectoryItem>();
+    private String path = "/";
     private ListView listView;
     private LinearLayout llDelete;
     private LinearLayout llCopy;
     private LinearLayout bMove;
     private LinearLayout llShare;
     private LinearLayout llAddToFavorites;
-    private static boolean checkBoxVisibility = false;
     private LinearLayout llButtons;
     private ImageButton ibRootDirectory;
     private ImageButton ibNewFolder;
     private ImageButton ibSort;
     private ImageButton ibHome;
-    private Comparator comparator;
+    private Comparator comparator = new DirectoryItem.CompName();
     private String[] sortVariants = {"Size", "Date", "Name"};
-    private SharedPreferencesHelper spHelper;
-    private SharedPreferences sPref;
 
 
     private RecyclerView horizontal_recycler_view;
-    private static List<String> horizontalList;               //a list of buttons of folders, leading
-    //to the current directory
+    private List<String> horizontalList;
     private static HorizontalAdapter horizontalAdapter;
 
     public class HorizontalAdapter extends RecyclerView.Adapter<HorizontalAdapter.MyViewHolder> {
@@ -137,8 +129,6 @@ public class MainActivity extends Activity {
         if (getIntent().hasExtra(PATH))
             path = getIntent().getStringExtra(PATH);
         setViews();
-        spHelper = new SharedPreferencesHelper(MainActivity.this);
-
         horizontalAdapter = new HorizontalAdapter(getCurrentPathButtonsList());
         LinearLayoutManager horizontalLayoutManagaer
                 = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -146,10 +136,6 @@ public class MainActivity extends Activity {
         horizontal_recycler_view.setAdapter(horizontalAdapter);
         directoryItemAdapter = new DirectoryItemAdapter(this, R.layout.layout_list_item);
         listView.setAdapter(directoryItemAdapter);
-    }
-
-    public static boolean isCheckBoxVisibility() {
-        return checkBoxVisibility;
     }
 
     @Override
@@ -160,9 +146,9 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (checkBoxVisibility)
-            checkBoxVisibility = false;
-        else if (path == "/")
+        if (directoryItemAdapter.isCheckBoxVisibility)
+            directoryItemAdapter.isCheckBoxVisibility = false;
+        else if (path.equals("/"))
             finish();
         else
             path = cutPath(path);
@@ -188,17 +174,15 @@ public class MainActivity extends Activity {
                 }
             }
         }
-        // Put the data into the lists
         horizontalList = getCurrentPathButtonsList();
         if (horizontalList.size() > 1)
             horizontalList.remove(0);
         horizontalAdapter.updateHorizontalList(horizontalList);
-        if (comparator != null)
-            Collections.sort(items, comparator);
+        Collections.sort(items, comparator);
         directoryItemAdapter.updateList(items);
     }
 
-    private static List<String> getCurrentPathButtonsList() {
+    private List<String> getCurrentPathButtonsList() {
         List<String> buttons = new ArrayList<String>(Arrays.asList(path.split("/")));
         return buttons;
     }
@@ -219,7 +203,6 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
         if (bool) {
-            Toast.makeText(MainActivity.this, "Created " + folder, Toast.LENGTH_LONG).show();
             refreshList();
         }
     }
@@ -335,15 +318,13 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public static void shareMultiple(ArrayList<Uri> files, Context context) {
+    private void shareMultiple(ArrayList<Uri> files, Context context) {
         final Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         intent.setType("*/*");
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
-        context.startActivity(Intent.createChooser(intent, "Share"));
+        context.startActivity(Intent.createChooser(intent, "Share via"));
     }
 
-
-    //a method sets views
     private void setViews() {
         horizontal_recycler_view = (RecyclerView) findViewById(R.id.horizontal_recycler_view);
         listView = (ListView) findViewById(R.id.listView);
@@ -367,7 +348,6 @@ public class MainActivity extends Activity {
                                     comparator = new DirectoryItem.CompDate();
                                 if (which == 2)
                                     comparator = new DirectoryItem.CompName();
-                                Toast.makeText(MainActivity.this, sortVariants[which], Toast.LENGTH_LONG).show();
                                 Collections.sort(items, comparator);
                                 directoryItemAdapter.updateList(items);
                             }
@@ -409,13 +389,14 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 List<DirectoryItem> list = directoryItemAdapter.getList();
+                ArrayList<String> filesToAdd = new ArrayList<String>();
                 for (int i = 0; i < list.size(); i++) {
                     if (list.get(i).getSelected()) {
-                        spHelper.addToFavorites(list.get(i).getFilepath());
-
+                        write(list.get(i).getFilepath());
                     }
                 }
-                checkBoxVisibility = false;
+                directoryItemAdapter.isCheckBoxVisibility = false;
+                llButtons.setVisibility(View.GONE);
                 refreshList();
             }
         });
@@ -428,6 +409,9 @@ public class MainActivity extends Activity {
                     filesToShare.add(Uri.fromFile(new File(list.get(i).getFilepath())));
                 }
             shareMultiple(filesToShare, MainActivity.this);
+            directoryItemAdapter.isCheckBoxVisibility = false;
+            refreshList();
+            llButtons.setVisibility(View.GONE);
         });
         llDelete = (LinearLayout) findViewById(R.id.llDelete);
         llDelete.setOnClickListener(new View.OnClickListener() {
@@ -445,7 +429,6 @@ public class MainActivity extends Activity {
                                                 delete(list.get(i).getFilepath());
                                             }
                                         }
-                                        checkBoxVisibility = false;
                                         refreshList();
                                     }
                                 }
@@ -457,6 +440,8 @@ public class MainActivity extends Activity {
                         });
                 AlertDialog alert = builder.create();
                 alert.show();
+                directoryItemAdapter.isCheckBoxVisibility = false;
+                llButtons.setVisibility(View.GONE);
             }
         });
         llCopy = (LinearLayout) findViewById(R.id.llCopy);
@@ -464,7 +449,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (getCountOfSelectedItems() > 0) {
-                    checkBoxVisibility = false;
+                    directoryItemAdapter.isCheckBoxVisibility = false;
                     Intent intent = new Intent(MainActivity.this, CopyMoveActivity.class);
                     intent.putExtra(PATH, path);
                     startActivityForResult(intent, INTENT_COPY);
@@ -476,7 +461,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (getCountOfSelectedItems() > 0) {
-                    checkBoxVisibility = false;
+                    directoryItemAdapter.isCheckBoxVisibility = false;
                     Intent intent = new Intent(MainActivity.this, CopyMoveActivity.class);
                     intent.putExtra(PATH, path);
                     startActivityForResult(intent, INTENT_MOVE);
@@ -511,7 +496,7 @@ public class MainActivity extends Activity {
                                                 @Override
                                                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                                                     llButtons.setVisibility(View.VISIBLE);
-                                                    checkBoxVisibility = true;
+                                                    directoryItemAdapter.isCheckBoxVisibility = true;
                                                     DirectoryItem di = (DirectoryItem) items.get(position);
                                                     di.setSelected(true);
                                                     items.remove(position);

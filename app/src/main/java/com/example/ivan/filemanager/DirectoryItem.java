@@ -1,5 +1,6 @@
 package com.example.ivan.filemanager;
 
+import android.util.Log;
 import android.widget.CheckBox;
 
 import java.io.File;
@@ -36,34 +37,26 @@ public class DirectoryItem {
         this.path = filePath.substring(0, a);
     }
 
-    // Comparator
     public static class CompSize implements Comparator<DirectoryItem> {
         @Override
         public int compare(DirectoryItem di1, DirectoryItem di2) {
-            return (int) (new File(di1.getFilepath()).length()-(new File(di2.getFilepath()).length()));
-
-//            return new File(arg0.getFilepath()).length() - new File(arg1.getFilepath()).length();
-//            return arg0. - arg1.id;
+            return (int) (new File(di1.getFilepath()).length() - (new File(di2.getFilepath()).length()));
         }
     }
 
     public static class CompDate implements Comparator<DirectoryItem> {
-
         @Override
         public int compare(DirectoryItem di1, DirectoryItem di2) {
-            return Integer.valueOf(di1.getLastModified().compareTo(di2.getLastModified()));
+            return Integer.valueOf((int) new File(di1.getFilepath()).lastModified() - (int) new File(di2.getFilepath()).lastModified());
         }
     }
 
     public static class CompName implements Comparator<DirectoryItem> {
-
         @Override
         public int compare(DirectoryItem di1, DirectoryItem di2) {
             return Integer.valueOf(di1.getName().compareToIgnoreCase(di2.getName()));
         }
     }
-
-
 
 
     public void setSelected(boolean selected) {

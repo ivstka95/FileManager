@@ -25,9 +25,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:paddingLeft="16dp"
+            android:textSize="18sp"
             android:text="All files"
             android:textColor="@color/colorWhite"
-            android:textSize="18sp" />
+             />
 
         <ImageButton
             android:id="@+id/ibNewFolder"
